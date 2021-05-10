@@ -18,6 +18,7 @@
 [x] 课程表
 
 ## 安装
+[![NPM](https://nodei.co/npm/zfnew-node.png)](https://nodei.co/npm/zfnew-node/)
 ```
 npm install zfnew-node
 ```
