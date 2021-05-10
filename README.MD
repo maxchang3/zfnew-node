@@ -12,6 +12,7 @@
 [zfnew](https://github.com/NeroAsmarr/zfnew) 是基于Python的新版正方教务API，我使用过非常好用，也适合于校园APP、小程序、网页的构建。但是处于某些业务需要Node.js部署，故开发了此项目。
 
 已实现的功能：
+
 [x] 自动登陆、cookies获取
 
 [x] 个人信息
