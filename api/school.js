@@ -41,46 +41,36 @@ module.exports = class School {
      * @returns {Object} 返回promise对象，包含{"code":"……","result":"……"} code: 1为登录成功，0为登录失败。 result： 若code为0则为失败信息。若code为1则为headers。
      * @instance
      */
-    login(sid, password) {
-        return new Promise((resolve) => {
-            this._request(this.keyUrl)
-                .then((login_req) => {
-                    if (login_req == "error") return login_req;
-                    let res = JSON.parse(login_req);
-                    let enPassword = this._getRSA(res['modulus'], res['exponent'], password);
-                    return Promise.resolve(enPassword);
-                })
-                .then((enPassword) => {
-                    this._request(this.loginUrl)
-                        .then((html) => {
-                            const $ = cheerio.load(html);
-                            let csrftoken = $("#csrftoken").val();
-                            //console.log(csrftoken)
-                            let loginParam = {
-                                "csrftoken": csrftoken,
-                                'yhm': sid,
-                                'mm': enPassword,
-                            }
-                            return Promise.resolve(loginParam);
-                        }).then((loginParam) => {
-                            this._request(this.loginUrl, "POST", loginParam).then((loginFinal) => {
-                                if (loginFinal) {
-                                    resolve({"code":"1","result":this.headers});
-                                    // this._request(this.baseUrl+"/jwglxt/xsxxxggl/xsxxwh_cxCkDgxsxx.html?gnmkdm=N100801").then((html)=>{
-                                    //     resolve({"code":"1","result":html});
-                                    // })
-                                } else {
-                                    const $ = cheerio.load(loginFinal);
-                                    let result = $("#tips").text();
-                                    resolve({"code":"0","result":result});
-                                }
-                            })
-                        })
-                })
-
+     async login(sid, password) {
+        let enPassword = await this._request(this.keyUrl).then(login_req => {
+            if (login_req == "error") return login_req;
+            let res = JSON.parse(login_req);
+            return this._getRSA(res['modulus'], res['exponent'], password);
+        });
+        let loginParam = await this._request(this.loginUrl).then(html => {
+            const $ = cheerio.load(html);
+            let csrftoken = $("#csrftoken").val();
+            //console.log(csrftoken)
+            return {
+                "csrftoken": csrftoken,
+                'yhm': sid,
+                'mm': enPassword,
+            }
+        });
+        let final_result = await this._request(this.loginUrl, "POST", loginParam).then((loginFinal) => {
+            if (loginFinal) {
+                return({ "code": "1", "result": this.headers });
+                // this._request(this.baseUrl+"/jwglxt/xsxxxggl/xsxxwh_cxCkDgxsxx.html?gnmkdm=N100801").then((html)=>{
+                //     resolve({"code":"1","result":html});
+                // })
+            } else {
+                const $ = cheerio.load(loginFinal);
+                let result = $("#tips").text();
+                return({ "code": "0", "result": result });
+            }
         })
-
-    };
+        return final_result;
+    }
     // 保存cookie的request请求，存疑：使用jar: true才能记住登录请求，是否内部的cookie处理实际上是没用的？
     _request = (url, method = "GET", data = null) => {
         return new Promise((resolve) => {
