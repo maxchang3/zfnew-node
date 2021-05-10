@@ -15,11 +15,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "homepage": "https://github.com/MaxChang3/zfnew-node",
   "keywords": [
     "zfnew",
     "正方教务",
     "教务系统"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaxChang3/zfnew-node.git"
+  },
   "author": "Max C. Foo",
   "license": "MIT"
 }
