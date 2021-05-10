@@ -71,6 +71,7 @@ XXU.login('你的学号', '你的密码').then(info=>{
 |sid |String|学号/教工号|
 |password | String|密码|
 
+
 返回promise对象，包含{"code":"……","result":"……"} 
 
 code: 1为登录成功，0为登录失败。 
@@ -107,6 +108,7 @@ Todo：整理部分常用参数 []。
 |  ----  | ----  |----|
 |year |String|学年，如2021。（注，如今年为2021年，是2020-2021学年，则取2020）|
 |term | String|学期数，如1，2，3，full为整个学年|
+
 返回promise对象，包含获取的课程表信息。
 
 #### GetInfo.getGrade(year, term);
@@ -114,6 +116,7 @@ Todo：整理部分常用参数 []。
 |  ----  | ----  |----|
 |year |String|学年，如2021。（注，如今年为2021年，是2020-2021学年，则取2020）|
 |term | String|学期数，如1，2，3，full为整个学年|
+
 返回promise对象，包含获取的成绩信息。
 
 #### GetInfo.getInfoFromSch();
