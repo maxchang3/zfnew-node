@@ -7,15 +7,19 @@
 
 > 本项目对部分学校可能存在兼容性问题，受制于作者只上了一个大学，有任何兼容性问题欢迎提出……
 
-> 登录那里的promise嵌套写的很丑，感觉还存在性能问题，应该要优化，所以现阶段稳定性运行还未测试，慎重使用或直接投入生产环境。
+>~~登录那里的promise嵌套写的很丑，感觉还存在性能问题，应该要优化，所以现阶段稳定性运行还未测试，慎重使用或直接投入生产环境。~~ √已经在[ETFTS](https://github.com/etfts)老师帮助下改善。
 
 [zfnew](https://github.com/NeroAsmarr/zfnew) 是基于Python的新版正方教务API，我使用过非常好用，也适合于校园APP、小程序、网页的构建。但是处于某些业务需要Node.js部署，故开发了此项目。
 
 已实现的功能：
 [x] 自动登陆、cookies获取
+
 [x] 个人信息
+
 [x] 成绩
+
 [x] 课程表
+
 
 ## 安装
 [![NPM](https://nodei.co/npm/zfnew-node.png)](https://nodei.co/npm/zfnew-node/)
@@ -34,22 +38,13 @@ const School = zfnew.School;
 const GetInfo = zfnew.GetInfo;
 
 let XXU = new School("http://jwxt.xxx.edu.cn");
-XXU.login('你的学号', '你的密码').then(info=>{
+XXU.login('你的学号', '你的密码').then(async(info)=>{
     if(info['code']==1){
         GetInfo.init(XXU.info());  
-        // 注意，本模块所有的操作都是返回的promise对象，请使用then接收参数后进行处理。
-        GetInfo.getGrade("2020","1").then((info)=>{
-            console.log(info);
-        });
-        GetInfo.getSchedule("2020","2").then((info)=>{
-            console.log(info);
-        });
-        Promise.all([
-            GetInfo.getInfo(),
-            GetInfo.getDetailInfo(),
-        ]).then((info)=>{
-            console.log(info[0],info[1]);
-        })
+        // 注意，本模块所有的操作都是返回的promise对象，请使用then或await接收参数后进行处理。
+        let grade = await GetInfo.getGrade("2020","1");
+        let schedule = await GetInfo.getSchedule("2020","1");
+        console.log(grade,schedule);
 
     }else{
         console.log(info['result']);

@@ -102,7 +102,7 @@ module.exports = {
         }, 'kbList'];
         return new Promise((resolve) => {
             _srequest(urlSchedule, "POST", data).then(json => {
-                let flag = newMap[1] == 'kblist' || newMap[1] == 'items';
+                let flag = newMap[1] == 'kbList' || newMap[1] == 'items';
                 let oldList = JSON.parse(json)[newMap[1]];
                 let newList = _mappingDicList(flag ? oldList : [oldList], newMap[0]);
                 //非课表部分场景下不是[{},{},{}]的形式，暂时以此形式分别，若此接口还有其他场景下调用应重构。
