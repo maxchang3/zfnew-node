@@ -2,6 +2,7 @@
 # Zfnew-Node based on [zfnew](https://github.com/NeroAsmarr/zfnew)
 
 ##  简介
+Node.js下获取新正方教务系统的相关信息，便于二次开发使用，支持自动登录、获取课表、成绩、个人信息。
 
 > 本项目部分代码和内容逻辑借鉴自 [zfnew](https://github.com/NeroAsmarr/zfnew) 
 
@@ -9,7 +10,7 @@
 
 >~~登录那里的promise嵌套写的很丑，感觉还存在性能问题，应该要优化，所以现阶段稳定性运行还未测试，慎重使用或直接投入生产环境。~~ √已经在[ETFTS](https://github.com/etfts)老师帮助下改善。
 
-[zfnew](https://github.com/NeroAsmarr/zfnew) 是基于Python的新版正方教务API，我使用过非常好用，也适合于校园APP、小程序、网页的构建。但是处于某些业务需要Node.js部署，故开发了此项目。
+[zfnew](https://github.com/NeroAsmarr/zfnew) 是基于Python的新版正方教务API，我使用过非常好用，也适合于校园APP、小程序、网页的构建。但是出于某些业务需要Node.js部署，故开发了此项目。
 
 已实现的功能：
 
