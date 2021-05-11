@@ -57,11 +57,13 @@ XXU.login('你的学号', '你的密码').then(async(info)=>{
 ## 接口
 
 ### School类
+
 #### new School(baseUrl);
 |Name	|Type|	Description|
 |  ----  | ----  |----|
 |baseUrl|String|教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/|
 
+---
 
 #### School.login(sid,password);
 |Name	|Type|	Description|
@@ -75,13 +77,22 @@ XXU.login('你的学号', '你的密码').then(async(info)=>{
 code: 1为登录成功，0为登录失败。 
 result： 若code为0则为失败信息。若code为1则为headers。
 
+---
+
+
 #### School&#46;info();
 返回包含各种组合后的url以及登录后含cookie的headers,用于登录成功后传递参数。
+
+
+---
 
 
 ### GetInfo 工具
 #### GetInfo.init(data);
 初始化GetInfo，请传递School&#46;info();的返回值。
+
+---
+
 
 #### GetInfo.getDetailInfo();
 获取已登录学生的详细信息。
@@ -89,17 +100,23 @@ result： 若code为0则为失败信息。若code为1则为headers。
 进行此操作请先进行School.login与GetInfo.init()。
 返回promise对象，包含由教务系统获取的详细信息。
   
-【注意】 此信息包含身份证号、考生号、户籍所在地、邮箱等敏感信息，有较大的安全隐患。除特殊情况和内部使用下，对于仅需要做验证部分信息（如姓名专业年级）情况下不建议使用此方法。
+>【注意】 此信息包含身份证号、考生号、户籍所在地、邮箱等敏感信息，有较大的安全隐患。除特殊情况和内部使用下，对于仅需要做验证部分信息（如姓名专业年级）情况下不建议使用此方法。
 
-如果只是获得基本信息请使用getInfo()或getInfoFromSch();
+> 如果只是获得基本信息请使用getInfo()或getInfoFromSch();
 
-经过简单考察不同学校有较大区别，建议按需获取，故不做参数整理。
-Todo：整理部分常用参数 []。
+> 经过简单考察不同学校有较大区别，建议按需获取，故未做参数整理。
+
+* [ ] Todo：整理部分常用参数
+
+---
 
 #### GetInfo.getInfo();
 获取已登录学生的基本信息。
 进行此操作请先进行School.login与GetInfo.init()。
 返回promise对象，包含获取的信息。
+
+---
+
 
 #### GetInfo.getSchedule(year, term);
 |Name	|Type|	Description|
@@ -109,6 +126,8 @@ Todo：整理部分常用参数 []。
 
 返回promise对象，包含获取的课程表信息。
 
+---
+
 #### GetInfo.getGrade(year, term);
 |Name	|Type|	Description|
 |  ----  | ----  |----|
@@ -116,6 +135,9 @@ Todo：整理部分常用参数 []。
 |term | String|学期数，如1，2，3，full为整个学年|
 
 返回promise对象，包含获取的成绩信息。
+
+---
+
 
 #### GetInfo.getInfoFromSch();
 从课程表接口获得学生信息，不含二级教学单位。
