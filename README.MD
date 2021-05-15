@@ -22,6 +22,10 @@ Node.js下获取新正方教务系统的相关信息，便于二次开发使用�
 
 - [x] 课程表
 
+## 兼容性
+你是否已经对你的学校进行了测试呢？欢迎补充测试生效的学校
+- [x] xx大学
+- [x] xx学院  
 
 ## 安装
 [![NPM](https://nodei.co/npm/zfnew-node.png)](https://nodei.co/npm/zfnew-node/)
