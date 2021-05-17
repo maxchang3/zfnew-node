@@ -1,6 +1,9 @@
 const request = require('request').defaults({jar: true}); // jar true才行
 const cheerio = require('cheerio');
 const rsa = require('node-bignumber');
+const fs = require('fs');
+const crypto = require('crypto');
+const path = require('path');
 
 module.exports = class School {
     /**
@@ -18,6 +21,7 @@ module.exports = class School {
             'Cookie': '',
         };
         //this.cookie = "";
+        this.CACHE_PATH = path.resolve(__dirname, '../.cache');
     };
 
     /**
@@ -42,11 +46,19 @@ module.exports = class School {
      * @instance
      */
      async login(sid, password) {
+        let cache = this._getCache(sid);
+        //  存在缓存中直接应用。
+        if (cache) { 
+            console.log(cache);
+            this.headers = JSON.parse(cache);
+            return({ "code": "1", "result": this.headers });
+        } 
         let enPassword = await this._request(this.keyUrl).then(login_req => {
             if (login_req == "error") return login_req;
             let res = JSON.parse(login_req);
             return this._getRSA(res['modulus'], res['exponent'], password);
         });
+        
         let loginParam = await this._request(this.loginUrl).then(html => {
             const $ = cheerio.load(html);
             let csrftoken = $("#csrftoken").val();
@@ -59,10 +71,8 @@ module.exports = class School {
         });
         let final_result = await this._request(this.loginUrl, "POST", loginParam).then((loginFinal) => {
             if (loginFinal) {
+                this._createCache(sid,JSON.stringify(this.headers));
                 return({ "code": "1", "result": this.headers });
-                // this._request(this.baseUrl+"/jwglxt/xsxxxggl/xsxxwh_cxCkDgxsxx.html?gnmkdm=N100801").then((html)=>{
-                //     resolve({"code":"1","result":html});
-                // })
             } else {
                 return({ "code": "0", "result": "用户名或密码错误" });
             }
@@ -111,4 +121,20 @@ module.exports = class School {
         let encrypted = rsa.hex2b64(rsaKey.encrypt(password));
         return encrypted;
     };
+    _createCache(sid,context){
+        let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+        fs.writeFile(`${this.CACHE_PATH}/${userId}`,context,(error)=>{
+            if(error) return console.error(error);    
+        })
+    }
+    _getCache(sid){
+        let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+        let data;
+        try {
+            data = fs.readFileSync(`${this.CACHE_PATH}/${userId}`);
+        } catch (error) {
+            return false;
+        }
+        return data.toString();
+    }
 }
