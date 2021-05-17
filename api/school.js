@@ -64,15 +64,13 @@ module.exports = class School {
                 //     resolve({"code":"1","result":html});
                 // })
             } else {
-                const $ = cheerio.load(loginFinal);
-                let result = $("#tips").text();
-                return({ "code": "0", "result": result });
+                return({ "code": "0", "result": "用户名或密码错误" });
             }
         })
         return final_result;
     }
     // 保存cookie的request请求，存疑：使用jar: true才能记住登录请求，是否内部的cookie处理实际上是没用的？
-    _request = (url, method = "GET", data = null) => {
+    _request (url, method = "GET", data = null) {
         return new Promise((resolve) => {
             request({
                 method: method,
@@ -88,9 +86,16 @@ module.exports = class School {
                         this.headers['Cookie'] =  cookie.toString();// 没必要单独分出来一个cookie
                     }
                     if (response.statusCode == 200) {
+                        if(method=="POST"){
+                            const $ = cheerio.load(body);
+                            let result = $("#tips").text();
+                            if(result.indexOf('用户名或密码不正确')>=1){
+                                resolve(false)
+                            }
+                        }//登录时处理密码错误的情况
                         resolve(body);
                     } else if (response.statusCode == 302) {
-                        resolve(true)
+                        resolve(true);
                     }
                 } else {
                     resolve("Error"+error);
