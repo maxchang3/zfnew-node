@@ -10,7 +10,7 @@ module.exports = class School {
     * 初始化一个学校类。
     * @param {String} baseUrl 教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/
     */
-    constructor(baseUrl) {
+    constructor(baseUrl,useCache=false) {
         this.baseUrl = baseUrl;
         this.keyUrl = baseUrl + '/jwglxt/xtgl/login_getPublicKey.html';
         this.loginUrl = baseUrl + '/jwglxt/xtgl/login_slogin.html';
@@ -22,6 +22,7 @@ module.exports = class School {
         };
         this.cookie_route=''
         this.CACHE_PATH = path.resolve(__dirname, '../.cache');
+        this.useCache = useCache;
         //this.cookie = "";
     };
 
@@ -46,11 +47,19 @@ module.exports = class School {
      * @instance
      */
      async login(sid, password) {
-        let cache = this._getCache(sid);
-        //  存在缓存中直接应用。
-        if (cache) { 
-            this.headers = JSON.parse(cache);
-            return({ "code": "1", "result": this.headers });
+        //  存在缓存中直接应用
+        if(this.useCache) {
+            let cache = this._getCache(sid);
+            if(cache){
+                let headers = JSON.parse(cache);
+                let cacheAva = await this._testCache(headers);
+                if(cacheAva){
+                    this.headers = headers;
+                    return({ "code": "1", "result": this.headers });
+                }else{
+                    this._deleteCache(id);
+                }
+            }
         } 
         let enPassword = await this._request(this.keyUrl).then(login_req => {
             if (login_req == "error") return login_req;
@@ -80,12 +89,12 @@ module.exports = class School {
         return final_result;
     }
     // 保存cookie的request请求，存疑：使用jar: true才能记住登录请求，是否内部的cookie处理实际上是没用的？
-    _request (url, method = "GET", data = null) {
+    _request (url, method = "GET", data = null,headers=this.headers) {
         return new Promise((resolve) => {
             request({
                 method: method,
                 url: url,
-                headers: this.headers,
+                headers: headers,
                 form: data, //发送application/x-www-form-urlencoded才可，不能发json
                 //jar: this.jar, 不用jar了没用。
             }, (error, response, body) => {
@@ -94,10 +103,10 @@ module.exports = class School {
                     if (cookie!=undefined) {
                         // this.cookie = cookie.toString();// 传递string类型 
                         this.headers['Cookie'] =  cookie.toString();
-                        console.log(cookie[1])
-                        if(cookie[1].indexOf('route')!=-1){
-                            console.log(1111111111111)
-                            this.cookie_route = cookie[1]
+                        if(cookie[1]!=undefined){
+                            if(cookie[1].indexOf('route')!=-1){
+                                this.cookie_route = cookie[1]
+                            }
                         }
                     }
                     if (response.statusCode == 200) {
@@ -111,6 +120,8 @@ module.exports = class School {
                         resolve(body);
                     } else if (response.statusCode == 302) {
                         resolve(true);
+                    } else if (response.statusCode ==901){
+                        resolve(901)
                     }
                 } else {
                     resolve("Error"+error);
@@ -127,12 +138,14 @@ module.exports = class School {
         return encrypted;
     };
     _createCache(sid,context){
+        if(!(this.useCache)) return;
         let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
         fs.writeFile(`${this.CACHE_PATH}/${userId}`,context,(error)=>{
             if(error) return console.error(error);    
         })
     }
     _getCache(sid){
+        if(!(this.useCache)) return;
         let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
         let data;
         try {
@@ -141,5 +154,25 @@ module.exports = class School {
             return false;
         }
         return data.toString();
+    }
+    _deleteCache(sid){
+        let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+        let data;
+        try {
+           fs.unlinkSync(`${this.CACHE_PATH}/${userId}`);
+        } catch (error) {
+            return false;
+        }
+        return true;
+    }
+    _testCache=async(hd)=>{
+        if(!(this.useCache)) return;
+        let test_res = await this._request(this.baseUrl+"/jwglxt/","GET",null,hd);
+        if(test_res ==901){
+            return Promise.resolve(false)
+        }else{
+            return Promise.resolve(true)
+        }
+
     }
 }
