@@ -1,6 +1,6 @@
 {
   "name": "zfnew-node",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "新正方教务系统API的node.js版，部分代码借鉴自python版zfnew，方便小程序和node相关项目调用。",
   "main": "index.js",
   "directories": {
@@ -22,8 +22,7 @@
     "教务系统"
   ],
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MaxChang3/zfnew-node.git"
+    "url": "https://github.com/MaxChang3/zfnew-node"
   },
   "author": "Max C. Foo",
   "license": "MIT"
