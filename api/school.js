@@ -140,6 +140,9 @@ module.exports = class School {
     _createCache(sid,context){
         if(!(this.useCache)) return;
         let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+        if(!(fs.existsSync(this.CACHE_PATH))) fs.mkdir(this.CACHE_PATH, (err) => {
+            if (err) throw err;
+          });
         fs.writeFile(`${this.CACHE_PATH}/${userId}`,context,(error)=>{
             if(error) return console.error(error);    
         })
