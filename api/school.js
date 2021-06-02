@@ -10,7 +10,7 @@ module.exports = class School {
     * 初始化一个学校类。
     * @param {String} baseUrl 教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/
     */
-    constructor(baseUrl,useCache=false) {
+    constructor(baseUrl,useCache=false,timeout=0) {
         this.baseUrl = baseUrl;
         this.keyUrl = baseUrl + '/jwglxt/xtgl/login_getPublicKey.html';
         this.loginUrl = baseUrl + '/jwglxt/xtgl/login_slogin.html';
@@ -23,6 +23,7 @@ module.exports = class School {
         this.cookie_route=''
         this.CACHE_PATH = path.resolve(__dirname, '../.cache');
         this.useCache = useCache;
+        this.timeout = timeout;
         //this.cookie = "";
     };
 
@@ -33,10 +34,11 @@ module.exports = class School {
     */
     info(){
         return {
-            "baseUrl":this.baseUrl,
-            "keyUrl":this.keyUrl,
-            "loginUrl":this.loginUrl,
-            "headers" : this.headers,
+            baseUrl:this.baseUrl,
+            keyUrl:this.keyUrl,
+            loginUrl:this.loginUrl,
+            headers : this.headers,
+            timeout: this.timeout
         }
     };
     /**
@@ -96,7 +98,7 @@ module.exports = class School {
                 url: url,
                 headers: headers,
                 form: data, //发送application/x-www-form-urlencoded才可，不能发json
-                //jar: this.jar, 不用jar了没用。
+                timeout:this.timeout
             }, (error, response, body) => {
                 if (!error) {
                     let cookie = response.headers['set-cookie'];
