@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.9",
-    "node-bignumber": "^1.2.1",
-    "request": "^2.88.2"
+    "got": "^11.8.2",
+    "node-bignumber": "^1.2.1"
   },
   "devDependencies": {},
   "scripts": {
