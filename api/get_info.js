@@ -1,7 +1,7 @@
 const request = require('request').defaults({ jar: true });
 const cheerio = require('cheerio');
 
-let baseUrl, keyUrl, loginUrl, headers;
+let baseUrl, keyUrl, loginUrl, headers,timeout;
 let inited = false;
 
 module.exports = {
@@ -15,6 +15,7 @@ module.exports = {
         keyUrl = data.keyUrl;
         loginUrl = data.loginUrl;
         headers = data.headers;
+        timeout = data.timeout
     },
 
     /**
@@ -162,7 +163,8 @@ const _srequest = (afterUrl, method = "GET", data = null) => {
             method: method,
             url: baseUrl + afterUrl,
             headers: headers,
-            form: data // 使用form传递，即application/x-www-form-urlencoded
+            form: data, // 使用form传递，即application/x-www-form-urlencoded
+            timeout: timeout
         }, (error, response, body) => {
             if (!error && response.statusCode == 200) {
                 resolve(body);
