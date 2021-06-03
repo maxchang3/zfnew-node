@@ -16,6 +16,8 @@ Node.js下获取新正方教务系统的相关信息，便于二次开发使用�
 
 - [x] 自动登陆、cookies获取
 
+- [x] 缓存机制、复用cookie
+
 - [x] 个人信息
 
 - [x] 成绩
@@ -67,7 +69,7 @@ XXU.login('你的学号', '你的密码').then(async(info)=>{
 |  ----  | ----  |----|
 |baseUrl|String|教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/|
 |useCache（可选）|boolean|是否使用缓存，开启该选项后会保存cookie到本地目录，在下次登录后通过校验后直接使用该缓存，以增强性能，但有账号信息泄露的风险，请注意使用场景合理开启|
-|timeout（可选）|boolean|设置超时时间，单位为秒，请合理设置（dev）|
+|timeout（可选）|Number|设置运行超时时间，单位为秒，请合理设置（dev）|
 ---
 
 #### School.login(sid,password);
