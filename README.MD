@@ -8,9 +8,8 @@ Node.js下获取新正方教务系统的相关信息，便于二次开发使用�
 
 > 本项目对部分学校可能存在兼容性问题，受制于作者只上了一个大学，有任何兼容性问题欢迎提出……
 
->~~登录那里的promise嵌套写的很丑，感觉还存在性能问题，应该要优化，所以现阶段稳定性运行还未测试，慎重使用或直接投入生产环境。~~ √已经在[ETFTS](https://github.com/etfts)老师帮助下改善。
 
-[zfnew](https://github.com/NeroAsmarr/zfnew) 是基于Python的新版正方教务API，我使用过非常好用，也适合于校园APP、小程序、网页的构建。但是出于某些业务需要Node.js部署，故开发了此项目。
+[zfnew](https://github.com/NeroAsmarr/zfnew) 是基于Python的新版正方教务API，我使用过非常好用，也适合于校园APP、小程序、网页的构建。出于某些业务需要Node.js部署，故开发了此项目。
 
 已实现的功能：
 
@@ -23,6 +22,8 @@ Node.js下获取新正方教务系统的相关信息，便于二次开发使用�
 - [x] 成绩
 
 - [x] 课程表
+
+- [x] 对教务系统接口比较凄惨的变量名称做了重新映射
 
 ## 兼容性
 你是否已经对你的学校进行了测试呢？欢迎补充测试生效的学校
@@ -45,8 +46,8 @@ const zfnew = require("zfnew-node")
 const School = zfnew.School;
 const GetInfo = zfnew.GetInfo;
 
-let XXU = new School("http://jwxt.xxx.edu.cn");
-XXU.login('你的学号', '你的密码').then(async(info)=>{
+let example = new School("http://jwxt.example.edu.cn");
+example.login('你的学号', '你的密码').then(async(info)=>{
     if(info['code']==1){
         GetInfo.init(XXU.info());  
         // 注意，本模块所有的操作都是返回的promise对象，请使用then或await接收参数后进行处理。
@@ -68,7 +69,7 @@ XXU.login('你的学号', '你的密码').then(async(info)=>{
 |Name	|Type|	Description|
 |  ----  | ----  |----|
 |baseUrl|String|教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/|
-|useCache（可选）|boolean|是否使用缓存，开启该选项后会保存cookie到本地目录，在下次登录后通过校验后直接使用该缓存，以增强性能，但有账号信息泄露的风险，请注意使用场景合理开启|
+|useCache（可选）|boolean|是否使用缓存，开启该选项后会保存cookie到本地目录，在下次登录后通过校验后直接使用该缓存，以增强性能，但有账号信息泄露的风险，现阶段缓存文件对用户的信息进行了md5加密，但是仍有cookie泄露风险，请注意使用场景合理开启|
 |timeout（可选）|Number|设置运行超时时间，单位为秒，请合理设置（dev）|
 ---
 
