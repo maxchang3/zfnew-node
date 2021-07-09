@@ -51,7 +51,8 @@ module.exports = class School {
      async login(sid, password) {
         //  存在缓存中直接应用
         if(this.useCache) {
-            let cache = this._getCache(sid);
+            let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+            let cache = this._getCache(userId);
             if(cache){
                 let headers = JSON.parse(cache);
                 let cacheAva = await this._testCache(headers);
@@ -59,7 +60,7 @@ module.exports = class School {
                     this.headers = headers;
                     return({ "code": "1", "result": this.headers });
                 }else{
-                    this._deleteCache(id);
+                    this._deleteCache(userId);
                 }
             }
         } 
@@ -149,9 +150,8 @@ module.exports = class School {
             if(error) return console.error(error);    
         })
     }
-    _getCache(sid){
+    _getCache(userId){
         if(!(this.useCache)) return;
-        let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
         let data;
         try {
             data = fs.readFileSync(`${this.CACHE_PATH}/${userId}`);
@@ -160,9 +160,7 @@ module.exports = class School {
         }
         return data.toString();
     }
-    _deleteCache(sid){
-        let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
-        let data;
+    _deleteCache(userId){
         try {
            fs.unlinkSync(`${this.CACHE_PATH}/${userId}`);
         } catch (error) {
@@ -172,12 +170,12 @@ module.exports = class School {
     }
     _testCache=async(hd)=>{
         if(!(this.useCache)) return;
-        let test_res = await this._request(this.baseUrl+"/jwglxt/","GET",null,hd);
-        if(test_res ==901){
-            return Promise.resolve(false)
-        }else{
-            return Promise.resolve(true)
-        }
 
+        let test_res = await this._request(this.baseUrl+"/jwglxt/","GET",null,hd);
+        if(test_res ==302 || test_res.indexOf("/jwglxt/xtgl/dl_loginForward.html")!=-1){
+            return Promise.resolve(true)
+        } else{
+            return Promise.resolve(false)
+        }
     }
 }
