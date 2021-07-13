@@ -43,9 +43,7 @@ npm install zfnew-node
 ```
 
 ```javascript
-const zfnew = require("zfnew-node")
-const School = zfnew.School;
-const GetInfo = zfnew.GetInfo;
+const {School,GetInfo}  = require("zfnew-node")
 
 let example = new School("http://jwxt.example.edu.cn");
 example.login('你的学号', '你的密码').then(async(info)=>{
