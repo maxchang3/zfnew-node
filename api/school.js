@@ -54,8 +54,8 @@ module.exports = class School {
             let cache = this._getCache(sid);
             if (cache) {
                 let headers = JSON.parse(cache);
-                let cacheAva = await this._testCache(headers);
-                if (cacheAva) {
+                let cacheValid = await this._testCache(headers);
+                if (cacheValid) {
                     this.headers = headers;
                     return ({ "code": "1", "result": this.headers });
                 } else {
@@ -178,7 +178,7 @@ module.exports = class School {
     }
     _testCache = async (hd) => {
         if (!(this.useCache)) return;
-        let test_res = await this._request(this.baseUrl + "/jwglxt/", "GET", null, hd);
+        let test_res = await this._request(this.baseUrl + "/jwglxt/", "GET", {}, hd);
         if (test_res == 901) {
             return Promise.resolve(false)
         } else {
