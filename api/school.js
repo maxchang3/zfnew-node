@@ -183,6 +183,5 @@ module.exports = class School {
         } else{
             return Promise.resolve(false)
         }
-
     }
 }
