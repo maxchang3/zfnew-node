@@ -93,7 +93,7 @@ module.exports = class School {
     _request(url, method = "GET", data = {}, headers = this.headers) {
         return new Promise(async (resolve,reject) => {
             try {
-                let timeout = this.timeout!=""?({request: this.timeout}):{}
+                let timeout = this.timeout!=""?({request: this.timeout}):{};
                 const response = await got({
                     url: url,
                     headers: headers,
