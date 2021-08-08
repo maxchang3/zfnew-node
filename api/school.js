@@ -59,7 +59,7 @@ module.exports = class School {
                     this.headers = headers;
                     return ({ "code": "1", "result": this.headers });
                 } else {
-                    this._deleteCache(id);
+                    this._deleteCache(sid);
                 }
             }
         }
