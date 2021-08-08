@@ -91,17 +91,18 @@ module.exports = class School {
         return final_result;
     }
     _request(url, method = "GET", data = {}, headers = this.headers) {
-        return new Promise(async (resolve) => {
+        return new Promise(async (resolve,reject) => {
             try {
+                let timeout = this.timeout!=""?({request: this.timeout}):{}
                 const response = await got({
                     url: url,
                     headers: headers,
                     method: method,
                     form: data,
-                    timeout: {request: this.timeout},
                     allowGetBody: true,
                     followRedirect:false,
                     retry: 0,
+                    timeout 
                 });
                 let body = response.body;
                 let cookie = response.headers['set-cookie'];
