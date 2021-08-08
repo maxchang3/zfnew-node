@@ -179,10 +179,10 @@ module.exports = class School {
     _testCache = async (hd) => {
         if (!(this.useCache)) return;
         let test_res = await this._request(this.baseUrl + "/jwglxt/", "GET", {}, hd);
-        if (test_res == 901) {
-            return Promise.resolve(false)
-        } else {
+        if(test_res ==302 || test_res.indexOf("/jwglxt/xtgl/dl_loginForward.html")!=-1){
             return Promise.resolve(true)
+        } else{
+            return Promise.resolve(false)
         }
 
     }
