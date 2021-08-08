@@ -168,7 +168,6 @@ module.exports = class School {
     }
     _deleteCache(sid) {
         let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
-        let data;
         try {
             fs.unlinkSync(`${this.CACHE_PATH}/${userId}`);
         } catch (error) {
