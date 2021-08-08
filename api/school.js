@@ -1,16 +1,16 @@
-const request = require('request').defaults({jar: true}); // jar true才行
 const cheerio = require('cheerio');
 const rsa = require('node-bignumber');
 const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
+const got = require('got');
 
 module.exports = class School {
     /**
     * 初始化一个学校类。
     * @param {String} baseUrl 教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/
     */
-    constructor(baseUrl,useCache=false,timeout=0) {
+    constructor(baseUrl, useCache = false, timeout = 0) {
         this.baseUrl = baseUrl;
         this.keyUrl = baseUrl + '/jwglxt/xtgl/login_getPublicKey.html';
         this.loginUrl = baseUrl + '/jwglxt/xtgl/login_slogin.html';
@@ -20,7 +20,7 @@ module.exports = class School {
             'Referer': this.loginUrl,
             'Cookie': '',
         };
-        this.cookie_route=''
+        this.cookie_route = ''
         this.CACHE_PATH = path.resolve(__dirname, '../.cache');
         this.useCache = useCache;
         this.timeout = timeout;
@@ -32,12 +32,12 @@ module.exports = class School {
     * @return {Object} 包含各种组合后的url以及登录后含cookie的headers。
     * @instance
     */
-    info(){
+    info() {
         return {
-            baseUrl:this.baseUrl,
-            keyUrl:this.keyUrl,
-            loginUrl:this.loginUrl,
-            headers : this.headers,
+            baseUrl: this.baseUrl,
+            keyUrl: this.keyUrl,
+            loginUrl: this.loginUrl,
+            headers: this.headers,
             timeout: this.timeout
         }
     };
@@ -48,21 +48,21 @@ module.exports = class School {
      * @returns {Object} 返回promise对象，包含{"code":"……","result":"……"} code: 1为登录成功，0为登录失败。 result： 若code为0则为失败信息。若code为1则为headers。
      * @instance
      */
-     async login(sid, password) {
+    async login(sid, password) {
         //  存在缓存中直接应用
-        if(this.useCache) {
+        if (this.useCache) {
             let cache = this._getCache(sid);
-            if(cache){
+            if (cache) {
                 let headers = JSON.parse(cache);
                 let cacheAva = await this._testCache(headers);
-                if(cacheAva){
+                if (cacheAva) {
                     this.headers = headers;
-                    return({ "code": "1", "result": this.headers });
-                }else{
+                    return ({ "code": "1", "result": this.headers });
+                } else {
                     this._deleteCache(id);
                 }
             }
-        } 
+        }
         let enPassword = await this._request(this.keyUrl).then(login_req => {
             if (login_req == "error") return login_req;
             let res = JSON.parse(login_req);
@@ -81,54 +81,59 @@ module.exports = class School {
             if (loginFinal) {
                 let cookies = this.headers['Cookie'];
                 let cookiesItem = cookies.split(";")[3].split(",")[2].split("=")[1];
-                this.headers['Cookie'] = "JSESSIONID="+cookiesItem +";"+this.cookie_route
-                this._createCache(sid,JSON.stringify(this.headers));
-                return({ "code": 1, "token": cookiesItem });
+                this.headers['Cookie'] = "JSESSIONID=" + cookiesItem + ";" + this.cookie_route
+                this._createCache(sid, JSON.stringify(this.headers));
+                return ({ "code": 1, "token": cookiesItem });
             } else {
-                return({ "code": -1, "message": "用户名或密码错误" });
+                return ({ "code": -1, "message": "用户名或密码错误" });
             }
         })
         return final_result;
     }
-    // 保存cookie的request请求，存疑：使用jar: true才能记住登录请求，是否内部的cookie处理实际上是没用的？
-    _request (url, method = "GET", data = null,headers=this.headers) {
-        return new Promise((resolve) => {
-            request({
-                method: method,
-                url: url,
-                headers: headers,
-                form: data, //发送application/x-www-form-urlencoded才可，不能发json
-                timeout:this.timeout
-            }, (error, response, body) => {
-                if (!error) {
-                    let cookie = response.headers['set-cookie'];
-                    if (cookie!=undefined) {
-                        // this.cookie = cookie.toString();// 传递string类型 
-                        this.headers['Cookie'] =  cookie.toString();
-                        if(cookie[1]!=undefined){
-                            if(cookie[1].indexOf('route')!=-1){
-                                this.cookie_route = cookie[1]
-                            }
+    _request(url, method = "GET", data = {}, headers = this.headers) {
+        return new Promise(async (resolve) => {
+            try {
+                const response = await got({
+                    url: url,
+                    headers: headers,
+                    method: method,
+                    form: data,
+                    timeout: {request: this.timeout},
+                    allowGetBody: true,
+                    followRedirect:false,
+                    retry: 0,
+                });
+                let body = response.body;
+                let cookie = response.headers['set-cookie'];
+                if (cookie != undefined) {
+                    // this.cookie = cookie.toString();// 传递string类型 
+                    this.headers['Cookie'] = cookie.toString();
+                    if (cookie[1] != undefined) {
+                        if (cookie[1].indexOf('route') != -1) {
+                            this.cookie_route = cookie[1]
                         }
                     }
-                    if (response.statusCode == 200) {
-                        if(method=="POST"){
-                            const $ = cheerio.load(body);
-                            let result = $("#tips").text();
-                            if(result.indexOf('用户名或密码不正确')!=-1){
-                                resolve(false)
-                            }
-                        }
-                        resolve(body);
-                    } else if (response.statusCode == 302) {
-                        resolve(true);
-                    } else if (response.statusCode ==901){
-                        resolve(901)
-                    }
-                } else {
-                    resolve("Error"+error);
                 }
-            });
+                if (response.statusCode == 200) {
+                    if (method == "POST") {
+                        const $ = cheerio.load(body);
+                        let result = $("#tips").text();
+                        console.log(result)
+                        if (result.includes('用户名或密码不正确')) {
+                            resolve(false)
+                        }
+                    }
+                    resolve(body);
+                } else if (response.statusCode == 302) {
+                    resolve(true);
+                } else if (response.statusCode == 901) {
+                    resolve(901)
+                }
+            } catch (error) {
+                reject(error);
+            }
+
+
         })
     };
     _getRSA(m, e, password) {
@@ -139,18 +144,18 @@ module.exports = class School {
         let encrypted = rsa.hex2b64(rsaKey.encrypt(password));
         return encrypted;
     };
-    _createCache(sid,context){
-        if(!(this.useCache)) return;
+    _createCache(sid, context) {
+        if (!(this.useCache)) return;
         let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
-        if(!(fs.existsSync(this.CACHE_PATH))) fs.mkdir(this.CACHE_PATH, (err) => {
+        if (!(fs.existsSync(this.CACHE_PATH))) fs.mkdir(this.CACHE_PATH, (err) => {
             if (err) throw err;
-          });
-        fs.writeFile(`${this.CACHE_PATH}/${userId}`,context,(error)=>{
-            if(error) return console.error(error);    
+        });
+        fs.writeFile(`${this.CACHE_PATH}/${userId}`, context, (error) => {
+            if (error) return console.error(error);
         })
     }
-    _getCache(sid){
-        if(!(this.useCache)) return;
+    _getCache(sid) {
+        if (!(this.useCache)) return;
         let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
         let data;
         try {
@@ -160,22 +165,22 @@ module.exports = class School {
         }
         return data.toString();
     }
-    _deleteCache(sid){
+    _deleteCache(sid) {
         let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
         let data;
         try {
-           fs.unlinkSync(`${this.CACHE_PATH}/${userId}`);
+            fs.unlinkSync(`${this.CACHE_PATH}/${userId}`);
         } catch (error) {
             return false;
         }
         return true;
     }
-    _testCache=async(hd)=>{
-        if(!(this.useCache)) return;
-        let test_res = await this._request(this.baseUrl+"/jwglxt/","GET",null,hd);
-        if(test_res ==901){
+    _testCache = async (hd) => {
+        if (!(this.useCache)) return;
+        let test_res = await this._request(this.baseUrl + "/jwglxt/", "GET", null, hd);
+        if (test_res == 901) {
             return Promise.resolve(false)
-        }else{
+        } else {
             return Promise.resolve(true)
         }
 
