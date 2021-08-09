@@ -36,10 +36,18 @@ Node.js下获取新正方教务系统的相关信息，支持自动登录、获�
 ```
 npm install zfnew-node
 ```
+或
+```
+yarn add zfnew-node
+```
 
 ## 快速上手
 ```
 npm install zfnew-node
+```
+或
+```
+yarn add zfnew-node
 ```
 
 ```javascript
