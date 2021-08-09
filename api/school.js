@@ -9,6 +9,8 @@ module.exports = class School {
     /**
     * 初始化一个学校类。
     * @param {String} baseUrl 教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/
+    * @param {boolean} 是否使用缓存，默认为false
+    * @param {Number}  超时时间，默认为0。
     */
     constructor(baseUrl, useCache = false, timeout = 0) {
         this.baseUrl = baseUrl;
