@@ -1,6 +1,6 @@
 {
   "name": "zfnew-node",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "新正方教务系统API的node.js版，部分代码借鉴自python版zfnew，方便小程序和node相关项目调用。",
   "main": "index.js",
   "directories": {
@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.9",
-    "node-bignumber": "^1.2.1",
-    "request": "^2.88.2"
+    "got": "^11.8.2",
+    "node-bignumber": "^1.2.1"
   },
   "devDependencies": {},
   "scripts": {

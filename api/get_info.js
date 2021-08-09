@@ -1,6 +1,5 @@
-const request = require('request').defaults({ jar: true });
 const cheerio = require('cheerio');
-
+const got = require('got');
 let baseUrl, keyUrl, loginUrl, headers,timeout;
 let inited = false;
 
@@ -157,22 +156,28 @@ module.exports = {
 }
 
 // 获取对应API接口所用的request请求。
-const _srequest = (afterUrl, method = "GET", data = null) => {
+const _srequest = (afterUrl, method = "GET", data = {}) => {
     if (!inited) throw new Error("未初始化，请先使用init函数初始化。");
-    return new Promise((resolve, reject) => {
-        request({
-            method: method,
-            url: baseUrl + afterUrl,
-            headers: headers,
-            form: data, // 使用form传递，即application/x-www-form-urlencoded
-            timeout: timeout
-        }, (error, response, body) => {
-            if (!error && response.statusCode == 200) {
-                resolve(body);
+    return new Promise(async(resolve, reject) => {
+        try {
+            const response = await got({
+                url: baseUrl + afterUrl,
+                headers: headers,
+                method: method,
+                form: data,
+                timeout: {request: this.timeout},
+                allowGetBody: true,
+                followRedirect:false,
+                retry: 0,
+            });
+            if(response.statusCode == 200){
+                resolve(response.body);
             } else {
-                reject(error);
+                reject(response.statusCode);
             }
-        })
+        } catch (error) {
+           reject(error);
+        }
     })
 }
 /**
