@@ -48,7 +48,7 @@ const {School,GetInfo}  = require("zfnew-node")
 let example = new School("http://jwxt.example.edu.cn");
 example.login('你的学号', '你的密码').then(async(info)=>{
     if(info['code']==1){
-        GetInfo.init(XXU.info());  
+        GetInfo.init(example.info());  
         // 注意，本模块所有的操作都是返回的promise对象，请使用then或await接收参数后进行处理。
         let grade = await GetInfo.getGrade("2020","1");
         let schedule = await GetInfo.getSchedule("2020","1");
