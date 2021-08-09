@@ -102,6 +102,7 @@ module.exports = {
         }, 'kbList'];
         return new Promise((resolve) => {
             _srequest(urlSchedule, "POST", data).then(json => {
+                //console.log(json)
                 let flag = newMap[1] == 'kbList' || newMap[1] == 'items';
                 let oldList = JSON.parse(json)[newMap[1]];
                 let newList = _mappingDicList(flag ? oldList : [oldList], newMap[0]);
