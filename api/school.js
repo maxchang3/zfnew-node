@@ -121,7 +121,6 @@ module.exports = class School {
                     if (method == "POST") {
                         const $ = cheerio.load(body);
                         let result = $("#tips").text();
-                        console.log(result)
                         if (result.includes('用户名或密码不正确')) {
                             resolve(false)
                         }
