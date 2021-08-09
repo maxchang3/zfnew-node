@@ -1,17 +1,17 @@
 {
   "name": "zfnew-node",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "新正方教务系统API的node.js版，部分代码借鉴自python版zfnew，方便小程序和node相关项目调用。",
   "main": "index.js",
-  "directories": {
-    "lib": "lib"
+  "exports": {
+    "require": "./index.js",
+    "import": "./esm/wrapper.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.9",
-    "got": "^11.8.2",
-    "node-bignumber": "^1.2.1"
+    "node-bignumber": "^1.2.1",
+    "got": "^11.8.2"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

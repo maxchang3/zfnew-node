@@ -2,7 +2,7 @@
 # Zfnew-Node based on [zfnew](https://github.com/NeroAsmarr/zfnew)
 
 ##  简介
-Node.js下获取新正方教务系统的相关信息，便于二次开发使用，支持自动登录、获取课表、成绩、个人信息。
+Node.js下获取新正方教务系统的相关信息，支持自动登录、获取课表、成绩、个人信息。
 
 > 本项目部分代码和内容逻辑借鉴自 [zfnew](https://github.com/NeroAsmarr/zfnew) 
 
@@ -10,7 +10,7 @@ Node.js下获取新正方教务系统的相关信息，便于二次开发使用�
 
 > 小程序云函数部署下可能需要babel进行转换。
 
-[zfnew](https://github.com/NeroAsmarr/zfnew) 是基于Python的新版正方教务API，我使用过非常好用，也适合于校园APP、小程序、网页的构建。出于某些业务需要Node.js部署，故开发了此项目。
+[zfnew](https://github.com/NeroAsmarr/zfnew) 是基于Python的新版正方教务API，适合于校园APP、小程序、网页的构建。出于某些业务需要Node.js部署，故开发了此项目。
 
 已实现的功能：
 
@@ -44,7 +44,7 @@ npm install zfnew-node
 
 ```javascript
 const {School,GetInfo}  = require("zfnew-node");
-
+// 或者使用es6模块 import { School, GetInfo } from "zfnew-node";
 let example = new School("http://jwxt.example.edu.cn");
 example.login('你的学号', '你的密码').then(async(info)=>{
     if(info['code']==1){
@@ -65,18 +65,18 @@ example.login('你的学号', '你的密码').then(async(info)=>{
 ### School类
 
 #### new School(baseUrl);
-|Name	|Type|	Description|
-|  ----  | ----  |----|
-|baseUrl|String|教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/|
-|useCache（可选）|boolean|是否使用缓存，开启该选项后会保存cookie到本地目录，在下次登录后通过校验后直接使用该缓存，以增强性能，但有账号信息泄露的风险，现阶段缓存文件对用户的信息进行了md5加密，但是仍有cookie泄露风险，请注意使用场景合理开启|
-|timeout（可选）|boolean|设置超时时间，单位为**毫秒**，请合理设置（dev）|
+| Name             | Type    | Description                                                                                                                                                                                                         |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| baseUrl          | String  | 教务系统基本地址，不包括二级目录。例如 http://jwxt.example.com/jwglxt/ 只需要jwglxt前的部分，如下所示: http://jwxt.example.com/                                                                                     |
+| useCache（可选） | boolean | 是否使用缓存，开启该选项后会保存cookie到本地目录，在下次登录后通过校验后直接使用该缓存，以增强性能，但有账号信息泄露的风险，现阶段缓存文件对用户的信息进行了md5加密，但是仍有cookie泄露风险，请注意使用场景合理开启 |
+| timeout（可选）  | boolean | 设置超时时间，单位为**毫秒**，请合理设置（dev）                                                                                                                                                                     |
 ---
 
 #### School.login(sid,password);
-|Name	|Type|	Description|
-|  ----  | ----  |----|
-|sid |String|学号/教工号|
-|password | String|密码|
+| Name     | Type   | Description |
+| -------- | ------ | ----------- |
+| sid      | String | 学号/教工号 |
+| password | String | 密码        |
 
 
 返回promise对象，包含{"code":"……","result":"……"} 
@@ -126,20 +126,20 @@ result： 若code为0则为失败信息。若code为1则为headers。
 
 
 #### GetInfo.getSchedule(year, term);
-|Name	|Type|	Description|
-|  ----  | ----  |----|
-|year |String|学年，如2021。（注，如今年为2021年，是2020-2021学年，则取2020）|
-|term | String|学期数，如1，2，3，full为整个学年|
+| Name | Type   | Description                                                     |
+| ---- | ------ | --------------------------------------------------------------- |
+| year | String | 学年，如2021。（注，如今年为2021年，是2020-2021学年，则取2020） |
+| term | String | 学期数，如1，2，3，full为整个学年                               |
 
 返回promise对象，包含获取的课程表信息。
 
 ---
 
 #### GetInfo.getGrade(year, term);
-|Name	|Type|	Description|
-|  ----  | ----  |----|
-|year |String|学年，如2021。（注，如今年为2021年，是2020-2021学年，则取2020）|
-|term | String|学期数，如1，2，3，full为整个学年|
+| Name | Type   | Description                                                     |
+| ---- | ------ | --------------------------------------------------------------- |
+| year | String | 学年，如2021。（注，如今年为2021年，是2020-2021学年，则取2020） |
+| term | String | 学期数，如1，2，3，full为整个学年                               |
 
 返回promise对象，包含获取的成绩信息。
 
