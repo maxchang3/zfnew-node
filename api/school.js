@@ -126,6 +126,9 @@ module.exports = class School {
                     }
                     resolve(body);
                 } else if (response.statusCode == 302) {
+                    if(response.headers.location == "http://jwxt.example.edu.cn/jwglxt/xtgl/login_slogin.html"){
+                        resolve(false);
+                    }
                     resolve(true);
                 } else if (response.statusCode == 901) {
                     resolve(901)
@@ -137,6 +140,14 @@ module.exports = class School {
 
         })
     };
+    /**
+     * 获取用户特征标识符，通过用户名与基础链接构造
+     * @param {string} sid 
+     * @returns {string} userId
+     */
+    _userId(sid){
+        return  crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+    };
     _getRSA(m, e, password) {
         let rsaKey = new rsa.Key();
         let modulus = rsa.b64tohex(m);
@@ -147,7 +158,7 @@ module.exports = class School {
     };
     _createCache(sid, context) {
         if (!(this.useCache)) return;
-        let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+        let userId = this._userId(sid);
         if (!(fs.existsSync(this.CACHE_PATH))) fs.mkdir(this.CACHE_PATH, (err) => {
             if (err) throw err;
         });
@@ -157,7 +168,7 @@ module.exports = class School {
     }
     _getCache(sid) {
         if (!(this.useCache)) return;
-        let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+        let userId = this._userId(sid);
         let data;
         try {
             data = fs.readFileSync(`${this.CACHE_PATH}/${userId}`);
@@ -167,7 +178,7 @@ module.exports = class School {
         return data.toString();
     }
     _deleteCache(sid) {
-        let userId = crypto.createHash('md5').update(`${sid}_${this.baseUrl}`).digest('hex');
+        let userId = this._userId(sid);
         try {
             fs.unlinkSync(`${this.CACHE_PATH}/${userId}`);
         } catch (error) {
@@ -178,11 +189,11 @@ module.exports = class School {
     _testCache = async (hd) => {
         if (!(this.useCache)) return;
         let test_res = await this._request(this.baseUrl + "/jwglxt/", "GET", {}, hd);
-        if(test_res ==302 || test_res.indexOf("/jwglxt/xtgl/dl_loginForward.html")!=-1){
+        if(!(test_res)) return Promise.resolve(false)
+        if(test_res.indexOf("/jwglxt/xtgl/dl_loginForward.html")!=-1){
             return Promise.resolve(true)
-        } else{
-            return Promise.resolve(false)
         }
+        return Promise.resolve(false)
 
     }
 }

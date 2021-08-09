@@ -172,7 +172,7 @@ const _srequest = (afterUrl, method = "GET", data = {}) => {
             if(response.statusCode == 200){
                 resolve(response.body);
             } else {
-                reject(statusCode);
+                reject(response.statusCode);
             }
         } catch (error) {
            reject(error);
