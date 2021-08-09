@@ -1,6 +1,6 @@
 {
   "name": "zfnew-node",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "新正方教务系统API的node.js版，部分代码借鉴自python版zfnew，方便小程序和node相关项目调用。",
   "main": "index.js",
   "directories": {
