@@ -113,7 +113,7 @@ module.exports = {
     },
     /**
      * 从课程表接口获得学生信息，不含二级教学单位。
-     * @returns {object} 返回promise对象，包含获取的信息。 {"class":"……","studentId":"……","name":"……"}; 
+     * @returns {Object} 返回promise对象，包含获取的信息。 {"class":"……","studentId":"……","name":"……"}; 
      */
     getInfoFromSch: () => {
         return module.exports.getSchedule((new Date().getFullYear() - 1).toString(), "1", [
@@ -187,14 +187,14 @@ const _srequest = (afterUrl, method = "GET", data = {}) => {
  * @returns {Object}  新的字典集合,如: [{A:1……},{B:2……}]
  */
 const _mappingDicList = (oldDicList, newMap) => {
-    let newList = []
+    let newList = [];
     for (const course of oldDicList) {
         let temp = Object.fromEntries(
             Object.entries(course).map(([key, value]) =>
                 newMap.hasOwnProperty(key) ? [newMap[key], value] : []
             )
-        )
-        delete temp.undefined
+        );
+        delete temp.undefined;
         newList.push(temp);
     }
     return newList;

@@ -127,7 +127,7 @@ module.exports = class School {
                     }
                     resolve(body);
                 } else if (response.statusCode == 302) {
-                    if(response.headers.location == "http://jwxt.example.edu.cn/jwglxt/xtgl/login_slogin.html"){
+                    if(response.headers.location == `${this.baseUrl}/jwglxt/xtgl/login_slogin.html`){
                         resolve(false);
                     }
                     resolve(true);
