@@ -29,13 +29,10 @@ module.exports = {
      * 经过简单考察不同学校有较大区别，建议按需获取，故不做整理。
      * Todo：整理部分常用参数。
      */
-    getDetailInfo: () => {
+    getDetailInfo: async() => {
         let urlDetailInfo = "/jwglxt/xsxxxggl/xsxxwh_cxCkDgxsxx.html?gnmkdm=N100801";
-        return new Promise((resolve) => {
-            _srequest(urlDetailInfo).then(json => {
-                resolve(JSON.parse(json));
-            })
-        })
+        let json =JSON.parse( await _srequest(urlDetailInfo));
+        return json
     },
 
     /**
@@ -45,24 +42,21 @@ module.exports = {
      * @return {Object} 返回promise对象，包含获取的信息。
      * 
      */
-    getInfo: () => {
+    getInfo: async() => {
         // 利用教务系统首页的用户信息模块获取用户的基本信息
         // 避免xsxxwh_cxCkDgxsxx.html（真sb的命名）内信息过于详细导致的安全问题。
         let urlInfo = "/jwglxt/xtgl/index_cxYhxxIndex.html?xt=jw&localeKey=zh_CN&gnmkdm=index";
-        return new Promise((resolve) => {
-            _srequest(urlInfo).then(html => {
-                const $ = cheerio.load(html);
-                let name = $(".media-heading").text();
-                //此处解析怀疑不同学校不同 可能需要根据自身情况处理。
-                let stuclass = $(".media-body >p").text().split(" ");
-                let info = {
-                    "name": name,
-                    "unit": stuclass[0],
-                    "class": stuclass[1],
-                };
-                resolve(info);
-            })
-        })
+        let html = await _srequest(urlInfo);
+        const $ = cheerio.load(html);
+        let name = $(".media-heading").text();
+        //此处解析怀疑不同学校不同 可能需要根据自身情况处理。
+        let stuclass = $(".media-body >p").text().split(" ");
+        let info = {
+            "name": name,
+            "unit": stuclass[0],
+            "class": stuclass[1],
+        };
+        return(info);
     },
     /**
      * 获取课程表信息。
@@ -70,7 +64,7 @@ module.exports = {
      * @param {String} term 学期数，如1，2，3，full为整个学年。
      * @return {Object} 返回promise对象，包含获取的课程表信息。
      */
-    getSchedule: (year, term, _newMap = null, _url = "jwglxt/kbcx/xskbcx_cxXsKb.html?gnmkdm=N2151") => {
+    getSchedule: async(year, term, _newMap = null, _url = "jwglxt/kbcx/xskbcx_cxXsKb.html?gnmkdm=N2151") => {
         let termMap = { "1": "3", "2": "12", "3": "16", "full": '' }; // 第一学期是3，第二学期是12，第三学期是16，整个学年为空''。
         term = termMap[term]; //不明白，不懂，不理解。
         // data and newMap: copy and modify from zfnew in python. sb中文拼音缩写变量。
@@ -100,16 +94,14 @@ module.exports = {
             'zxs': 'totalHours',
             'xf': 'credit',
         }, 'kbList'];
-        return new Promise((resolve) => {
-            _srequest(urlSchedule, "POST", data).then(json => {
-                //console.log(json)
-                let flag = newMap[1] == 'kbList' || newMap[1] == 'items';
-                let oldList = JSON.parse(json)[newMap[1]];
-                let newList = _mappingDicList(flag ? oldList : [oldList], newMap[0]);
-                //非课表部分场景下不是[{},{},{}]的形式，暂时以此形式分别，若此接口还有其他场景下调用应重构。
-                resolve(flag ? newList : newList[0]);
-            })
-        })
+        let json = _srequest(urlSchedule, "POST", data);
+        //console.log(json)
+        let flag = newMap[1] == 'kbList' || newMap[1] == 'items';
+        let oldList = JSON.parse(json)[newMap[1]];
+        let newList = _mappingDicList(flag ? oldList : [oldList], newMap[0]);
+        //非课表部分场景下不是[{},{},{}]的形式，暂时以此形式分别，若此接口还有其他场景下调用应重构。
+        return(flag ? newList : newList[0]);
+
     },
     /**
      * 从课程表接口获得学生信息，不含二级教学单位。
@@ -156,29 +148,27 @@ module.exports = {
 }
 
 // 获取对应API接口所用的request请求。
-const _srequest = (afterUrl, method = "GET", data = {}) => {
+const _srequest = async(afterUrl, method = "GET", data = {}) => {
     if (!inited) throw new Error("未初始化，请先使用init函数初始化。");
-    return new Promise(async(resolve, reject) => {
-        try {
-            const response = await got({
-                url: baseUrl + afterUrl,
-                headers: headers,
-                method: method,
-                form: data,
-                timeout: {request: this.timeout},
-                allowGetBody: true,
-                followRedirect:false,
-                retry: 0,
-            });
-            if(response.statusCode == 200){
-                resolve(response.body);
-            } else {
-                reject(response.statusCode);
-            }
-        } catch (error) {
-           reject(error);
+    try {
+        const response = await got({
+            url: baseUrl + afterUrl,
+            headers: headers,
+            method: method,
+            form: data,
+            timeout: {request: this.timeout},
+            allowGetBody: true,
+            followRedirect:false,
+            retry: 0,
+        });
+        if(response.statusCode == 200){
+            return(response.body);
+        } else {
+            return(response.statusCode);
         }
-    })
+    } catch (error) {
+        return(error);
+    }
 }
 /**
  * 遍历一个含多个字典的集合，根据newMap映射其对应键值。

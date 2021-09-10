@@ -187,11 +187,9 @@ module.exports = class School {
     _testCache = async (hd) => {
         if (!(this.useCache)) return;
         let test_res = await this._request(this.baseUrl + "/jwglxt/", "GET", {}, hd);
-        if(!(test_res)) return Promise.resolve(false)
-        if(test_res.indexOf("/jwglxt/xtgl/dl_loginForward.html")!=-1){
-            return Promise.resolve(true)
-        }
-        return Promise.resolve(false)
+        if(!(test_res)) return false
+        if(test_res.indexOf("/jwglxt/xtgl/dl_loginForward.html")!=-1)return true        
+        return false
 
     }
 }
