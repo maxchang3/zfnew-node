@@ -134,7 +134,7 @@ module.exports = class School {
                 return(901)
             }
         } catch (error) {
-            return(error);
+            console.error(error)
         }
 
     };
