@@ -8,12 +8,12 @@
     "import": "./esm/wrapper.js"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.9",
-    "node-bignumber": "^1.2.1",
-    "got": "^11.8.2"
+    "cheerio": "^1.0.0-rc.10",
+    "got": "^11.8.2",
+    "node-bignumber": "^1.2.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js"
   },
   "homepage": "https://github.com/MaxChang3/zfnew-node",
   "keywords": [
