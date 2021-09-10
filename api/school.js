@@ -92,54 +92,51 @@ module.exports = class School {
         })
         return final_result;
     }
-    _request(url, method = "GET", data = {}, headers = this.headers) {
-        return new Promise(async (resolve,reject) => {
-            try {
-                let timeout = this.timeout!=""?({request: this.timeout}):{};
-                const response = await got({
-                    url: url,
-                    headers: headers,
-                    method: method,
-                    form: data,
-                    allowGetBody: true,
-                    followRedirect:false,
-                    retry: 0,
-                    timeout 
-                });
-                let body = response.body;
-                let cookie = response.headers['set-cookie'];
-                if (cookie != undefined) {
-                    // this.cookie = cookie.toString();// 传递string类型 
-                    this.headers['Cookie'] = cookie.toString();
-                    if (cookie[1] != undefined) {
-                        if (cookie[1].indexOf('route') != -1) {
-                            this.cookie_route = cookie[1]
-                        }
+    async _request(url, method = "GET", data = {}, headers = this.headers) {
+        try {
+            let timeout = this.timeout!=""?({request: this.timeout}):{};
+            const response = await got({
+                url: url,
+                headers: headers,
+                method: method,
+                form: data,
+                allowGetBody: true,
+                followRedirect:false,
+                retry: 0,
+                timeout 
+            });
+            let body = response.body;
+            let cookie = response.headers['set-cookie'];
+            if (cookie != undefined) {
+                // this.cookie = cookie.toString();// 传递string类型 
+                this.headers['Cookie'] = cookie.toString();
+                if (cookie[1] != undefined) {
+                    if (cookie[1].indexOf('route') != -1) {
+                        this.cookie_route = cookie[1]
                     }
                 }
-                if (response.statusCode == 200) {
-                    if (method == "POST") {
-                        const $ = cheerio.load(body);
-                        let result = $("#tips").text();
-                        if (result.includes('用户名或密码不正确')) {
-                            resolve(false)
-                        }
-                    }
-                    resolve(body);
-                } else if (response.statusCode == 302) {
-                    if(response.headers.location == `${this.baseUrl}/jwglxt/xtgl/login_slogin.html`){
-                        resolve(false);
-                    }
-                    resolve(true);
-                } else if (response.statusCode == 901) {
-                    resolve(901)
-                }
-            } catch (error) {
-                reject(error);
             }
+            if (response.statusCode == 200) {
+                if (method == "POST") {
+                    const $ = cheerio.load(body);
+                    let result = $("#tips").text();
+                    if (result.includes('用户名或密码不正确')) {
+                        return(false)
+                    }
+                }
+                return(body);
+            } else if (response.statusCode == 302) {
+                if(response.headers.location == `${this.baseUrl}/jwglxt/xtgl/login_slogin.html`){
+                    return(false);
+                }
+                return(true);
+            } else if (response.statusCode == 901) {
+                return(901)
+            }
+        } catch (error) {
+            return(error);
+        }
 
-
-        })
     };
     /**
      * 获取用户特征标识符，通过用户名与基础链接构造
